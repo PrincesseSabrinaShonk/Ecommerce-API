@@ -52,7 +52,6 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
     public List<User> getAll()
     {
         List<User> users = new ArrayList<>();
-
         String sql = "SELECT * FROM users";
         try (Connection connection = getConnection())
         {
@@ -172,7 +171,7 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         return false;
 
 //        User user = getByUserName(username);
-//        return user != null;                       todo
+//        return user != null;
     }
 
     private User mapRow(ResultSet row) throws SQLException
