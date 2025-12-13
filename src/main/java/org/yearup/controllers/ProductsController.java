@@ -49,10 +49,8 @@ public class ProductsController
         try
         {
             var product = productDao.getById(id);
-
             if(product == null)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
             return product;
         }
         catch(Exception ex)
@@ -62,7 +60,7 @@ public class ProductsController
     }
 
     @PostMapping()
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public Product addProduct(@RequestBody Product product)
     {
         try
@@ -76,12 +74,13 @@ public class ProductsController
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')") // firs bugs was role_Admin
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
         try
         {
-            productDao.create(product);
+
+          productDao.update(id, product);  // productDao.create(product); ( we need to change this) i change line 83
         }
         catch(Exception ex)
         {
@@ -90,7 +89,7 @@ public class ProductsController
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(@PathVariable int id)
     {
         try
