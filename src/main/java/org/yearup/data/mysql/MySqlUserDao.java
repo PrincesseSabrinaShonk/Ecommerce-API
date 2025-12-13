@@ -57,9 +57,7 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         try (Connection connection = getConnection())
         {
             PreparedStatement statement = connection.prepareStatement(sql);
-
             ResultSet row = statement.executeQuery();
-
             while (row.next())
             {
                 User user = mapRow(row);
@@ -70,7 +68,6 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         {
             throw new RuntimeException(e);
         }
-
         return users;
     }
 
@@ -82,13 +79,10 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, id);
-
             ResultSet row = statement.executeQuery();
-
             if(row.next())
             {
-                User user = mapRow(row);
-                return user;
+                return mapRow(row);
             }
         }
         catch (SQLException e)
@@ -96,6 +90,16 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
             throw new RuntimeException(e);
         }
         return null;
+ //            {
+//                User user = mapRow(row);
+//                return user;
+//            }
+//        }
+//        catch (SQLException e)
+//        {
+//            throw new RuntimeException(e);
+
+
     }
 
     @Override
@@ -113,18 +117,26 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
             ResultSet row = statement.executeQuery();
             if(row.next())
             {
-
-                User user = mapRow(row);
-                return user;
+                return mapRow(row);
             }
         }
         catch (SQLException e)
         {
-            System.out.println(e);
+            throw new RuntimeException(e);
         }
 
         return null;
-    }
+//            {
+//
+//                User user = mapRow(row);
+//                return user;
+//            }
+//        }
+//        catch (SQLException e)
+//        {
+//            System.out.println(e);
+        }
+//        return null;
 
     @Override
     public int getIdByUsername(String username)
@@ -142,8 +154,25 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
     @Override
     public boolean exists(String username)
     {
-        User user = getByUserName(username);
-        return user != null;
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+        try (Connection connection = getConnection())
+        {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, username);
+            ResultSet row = statement.executeQuery();
+            if (row.next())
+            {
+                return row.getInt(1) > 0;
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+        return false;
+
+//        User user = getByUserName(username);
+//        return user != null;                       todo
     }
 
     private User mapRow(ResultSet row) throws SQLException

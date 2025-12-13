@@ -41,7 +41,6 @@ public class ProductsController
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }
-
     @GetMapping("{id}")
     @PreAuthorize("permitAll()")
     public Product getById(@PathVariable int id )
@@ -58,7 +57,6 @@ public class ProductsController
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }
-
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public Product addProduct(@RequestBody Product product)
@@ -79,7 +77,7 @@ public class ProductsController
     {
         try
         {
-// productDao.create(product); ( we need to change this) i change line 83
+            // productDao.create(product); ( we need to change this) i change line 83
           productDao.update(id, product);
         }
         catch(Exception ex)
@@ -98,7 +96,6 @@ public class ProductsController
 
             if(product == null)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
             productDao.delete(id);
         }
         catch(Exception ex)
