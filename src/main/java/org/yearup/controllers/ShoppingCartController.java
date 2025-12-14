@@ -103,32 +103,27 @@ public class ShoppingCartController {
             throw ex;
         }   catch(Exception ex)
         {  throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");  }
-        
     }
 
 
     // add a DELETE method to clear all products from the current users cart
     // https://localhost:8080/cart
-    @DeleteMapping("")
-    public void clearCart(Principal principal)
-    {
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clearCart(Principal principal)  {
         try
         {
             String userName = principal.getName();
             User user = userDao.getByUserName(userName);
             if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-            int userId = user.getId();
 
-            shoppingCartDao.clearCart(userId);
-        }
-        catch(ResponseStatusException ex)
-        {
-            throw ex;
-        }
+            int userId = user.getId();
+            shoppingCartDao.clearCart(userId);  //clear all product from cart
+        }  catch(ResponseStatusException ex) {
+            throw ex;} // preserve correct HTTP status codes
         catch(Exception ex)
         {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
-
     }
 }

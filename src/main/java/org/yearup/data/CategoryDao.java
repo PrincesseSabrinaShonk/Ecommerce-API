@@ -11,5 +11,6 @@ public interface CategoryDao
     void delete(int categoryId);
 
     class ShoppingCartDao {
+        //do nothing
     }
 }
