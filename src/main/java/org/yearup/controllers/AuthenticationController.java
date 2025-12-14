@@ -61,7 +61,7 @@ public class AuthenticationController {
         } catch (ResponseStatusException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.", ex); 
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.", ex);
         }
     }
 
@@ -70,28 +70,37 @@ public class AuthenticationController {
     public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto newUser) {
 
         try
-        {
+        {  // normalize username so exist+ create are consistent with login service
+            String username = newUser.getUsername().toLowerCase().trim();
+            // confirm password check
+            if (!newUser.getPassword().equals(newUser.getConfirmPassword())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match.");
+            }
             boolean exists = userDao.exists(newUser.getUsername());
             if (exists)
             {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Already Exists.");
             }
 
-            // create user
-            User user = userDao.create(new User(0, newUser.getUsername(), newUser.getPassword(), newUser.getRole()));
+            // create user,  use normalized username when creating
+            User user = userDao.create(new User(0, username, newUser.getPassword(), newUser.getRole()));
 
             // create profile
             Profile profile = new Profile();
             profile.setUserId(user.getId());
             profileDao.create(profile);
-
             return new ResponseEntity<>(user, HttpStatus.CREATED);
-        }
-        catch (Exception e)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+
+    } catch (ResponseStatusException ex) {
+            throw ex;
+        } catch (Exception e) {
+            {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            }
         }
     }
-
 }
+
+
+
 
