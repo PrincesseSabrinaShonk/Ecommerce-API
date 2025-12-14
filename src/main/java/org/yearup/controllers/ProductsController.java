@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("products")
+@RequestMapping("/products") // it made sure routes are consistently /products
 @CrossOrigin
 public class ProductsController
 {
@@ -44,7 +44,7 @@ public class ProductsController
                     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
                 }
     }
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("permitAll()")
     public Product getById(@PathVariable int id )
     {
@@ -55,13 +55,9 @@ public class ProductsController
             return product;
         }
         catch(ResponseStatusException ex)
-            {
-                throw ex;
-            }
+            {   throw ex; }
                 catch(Exception ex)
-            {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-            }
+            {throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");}
         }
 
     @PostMapping()
@@ -87,18 +83,13 @@ public class ProductsController
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
         try
-        {
+        { productDao.update(id, product);  }
             // productDao.create(product); ( we need to change this) i change line 83
-          productDao.update(id, product);
-        }
         catch(ResponseStatusException ex)
         {
-            throw ex;
-        }
+            throw ex; }
         catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-        }
+        {throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");}
     }
 
     @DeleteMapping("{id}")

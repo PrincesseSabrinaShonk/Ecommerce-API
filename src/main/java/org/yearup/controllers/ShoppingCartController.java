@@ -18,14 +18,14 @@ import java.security.Principal;
 // convert this class to a REST controller
 // only logged-in users should have access to these actions
 @RestController
-@RequestMapping("cart")
-@CrossOrigin
+@RequestMapping("/cart")
+@CrossOrigin // allow cross-site requests (matches other controllers)
 @PreAuthorize("isAuthenticated()")
 public class ShoppingCartController {
     // a shopping cart requires
-    private ShoppingCartDao shoppingCartDao;
-    private UserDao userDao;
-    private ProductDao productDao;
+    private final ShoppingCartDao shoppingCartDao;
+    private final UserDao userDao;
+    private final ProductDao productDao;
 
     @Autowired
     public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
@@ -41,44 +41,38 @@ public class ShoppingCartController {
             // get the currently logged-in username
             String userName = principal.getName();// find database user by userId
             User user = userDao.getByUserName(userName);
+
             if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
             int userId = user.getId();
 
             // use the shopping-cart-Dao to get all items in the cart and return the cart
             return shoppingCartDao.getByUserId(userId);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
-             catch(ResponseStatusException ex)
-            {
-                throw ex;
-            }
-                catch(Exception ex)
-            {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-            }
-        }
+    }
 
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
-    @PostMapping("products/{productId}")
+    @PostMapping("/products/{productId}")
     public ShoppingCart addProductToCart(@PathVariable int productId, Principal principal) {
         try {
             String userName = principal.getName();
             User user = userDao.getByUserName(userName);
-
             if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+
             int userId = user.getId();
 
-            if (ProductDao.getById(productId) == null)
+            if (productDao.getById(productId) == null)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-            shoppingCartDao.addProduct(userId, productId);
-            return shoppingCartDao.getByUserId(userId);
-        }
-        catch(ResponseStatusException ex)
-        {
+
+            shoppingCartDao.addProduct(userId, productId); //add item to cart
+            return shoppingCartDao.getByUserId(userId);  // return updated cart
+        } catch (ResponseStatusException ex) {
             throw ex;
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }
@@ -88,18 +82,21 @@ public class ShoppingCartController {
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
 
-    @PutMapping("products/{productId}")
+    @PutMapping("/products/{productId}")
     public ShoppingCart updateProductInCart(@PathVariable int productId, @RequestBody ShoppingCartItem item, Principal principal) {
         try {
             String userName = principal.getName();
             User user = userDao.getByUserName(userName);
+            if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
             int userId = user.getId();
 
-            if (ProductDao.getById(productId) == null)
+            if (productDao.getById(productId) == null) // validate product exists
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
             if(item == null || item.getQuantity() < 0)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantity must be 0 or greater.");
-            shoppingCartDao.updateProduct(userId,productId, item.getQuantity());
+
+            shoppingCartDao.updateProduct(userId,productId, item.getQuantity());  //update quantity
             return shoppingCartDao.getByUserId(userId);
         }
         catch(ResponseStatusException ex)
