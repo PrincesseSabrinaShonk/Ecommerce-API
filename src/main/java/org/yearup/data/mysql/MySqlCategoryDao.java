@@ -21,6 +21,16 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
     }
 
     @Override
+    public void addProduct(int userId, int productId) {
+
+    }
+
+    @Override
+    public void updateProduct(int userId, int productId, int quantity) {
+
+    }
+
+    @Override
     public List<Category> getAllCategories() // get all categories
     { List<Category> categories = new ArrayList<>();
         String sql = "SELECT * FROM categories";

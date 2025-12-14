@@ -20,6 +20,16 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         super(dataSource);
     }
 
+    @Override
+    public void addProduct(int userId, int productId) {
+
+    }
+
+    @Override
+    public void updateProduct(int userId, int productId, int quantity) {
+
+    }
+
 
     @Override
     public User create(User newUser)
