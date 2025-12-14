@@ -163,7 +163,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
 
     @Override
     public void clearCart(int userId) {
-        // FIX: implement DELETE cart: delete all items for user 
+        // FIX: implement DELETE cart: delete all items for user
         String sql = "DELETE FROM shopping_cart WHERE user_id = ?";
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement(sql))

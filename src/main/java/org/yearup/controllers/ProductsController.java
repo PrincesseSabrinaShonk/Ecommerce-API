@@ -32,31 +32,38 @@ public class ProductsController
                                 @RequestParam(name="subCategory", required = false) String subCategory
                                 )
     {
-        try
-        {
+        try {
             return productDao.search(categoryId, minPrice, maxPrice, subCategory);
         }
-        catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-        }
+             catch(ResponseStatusException ex)
+                {
+                    throw ex;
+                }
+                catch(Exception ex)
+                {
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+                }
     }
     @GetMapping("{id}")
     @PreAuthorize("permitAll()")
     public Product getById(@PathVariable int id )
     {
-        try
-        {
+        try {
             var product = productDao.getById(id);
-            if(product == null)
+            if (product == null)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             return product;
         }
-        catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        catch(ResponseStatusException ex)
+            {
+                throw ex;
+            }
+                catch(Exception ex)
+            {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            }
         }
-    }
+
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public Product addProduct(@RequestBody Product product)
@@ -64,6 +71,10 @@ public class ProductsController
         try
         {
             return productDao.create(product);
+        }
+        catch(ResponseStatusException ex)
+        {
+            throw ex;
         }
         catch(Exception ex)
         {
@@ -80,6 +91,10 @@ public class ProductsController
             // productDao.create(product); ( we need to change this) i change line 83
           productDao.update(id, product);
         }
+        catch(ResponseStatusException ex)
+        {
+            throw ex;
+        }
         catch(Exception ex)
         {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
@@ -90,16 +105,20 @@ public class ProductsController
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(@PathVariable int id)
     {
-        try
-        {
+        try {
             var product = productDao.getById(id);
-            if(product == null)
+            if (product == null)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             productDao.delete(id);
         }
-        catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        catch(ResponseStatusException ex)
+            {
+                throw ex;
+            }
+                catch(Exception ex)
+            {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            }
         }
     }
-}
+
