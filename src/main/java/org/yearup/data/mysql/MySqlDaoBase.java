@@ -17,8 +17,19 @@ public abstract class MySqlDaoBase
     {
         return dataSource.getConnection();
     }
-
-    public abstract void addProduct(int userId, int productId);
-
-    public abstract void updateProduct(int userId, int productId, int quantity);
 }
+//    private DataSource dataSource;
+//
+//    public MySqlDaoBase(DataSource dataSource)
+//    {
+//        this.dataSource = dataSource;
+//    }
+//
+//    protected Connection getConnection() throws SQLException
+//    {
+//        return dataSource.getConnection();
+//    }
+//
+//    public abstract void addProduct(int userId, int productId);
+//
+//    public abstract void updateProduct(int userId, int productId, int quantity);
