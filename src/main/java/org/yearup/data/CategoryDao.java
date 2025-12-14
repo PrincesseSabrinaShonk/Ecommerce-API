@@ -15,3 +15,7 @@ public interface CategoryDao
     class ShoppingCartDao {
     }
 }
+
+//
+//    List<Category> getAll();
+//    Category getById(int categoryId);
