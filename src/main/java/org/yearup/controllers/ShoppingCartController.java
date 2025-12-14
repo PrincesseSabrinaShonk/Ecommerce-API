@@ -99,15 +99,11 @@ public class ShoppingCartController {
             shoppingCartDao.updateProduct(userId,productId, item.getQuantity());  //update quantity
             return shoppingCartDao.getByUserId(userId);
         }
-        catch(ResponseStatusException ex)
-        {
+        catch(ResponseStatusException ex) {
             throw ex;
-        }
-        catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-        }
-
+        }   catch(Exception ex)
+        {  throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");  }
+        
     }
 
 
