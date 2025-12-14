@@ -1,5 +1,7 @@
 package org.yearup.data.mysql;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.yearup.models.Profile;
 import org.yearup.data.ProfileDao;
 
@@ -8,8 +10,10 @@ import java.sql.*;
 
 
 
-@Component
+@Repository
 public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
+
+    @Autowired
     public MySqlProfileDao(DataSource dataSource) {
         super(dataSource);
     }
@@ -40,10 +44,24 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
             ps.setString(7, profile.getCity());
             ps.setString(8, profile.getState());
             ps.setString(9, profile.getZip());
-            ps.executeUpdate();
+            int rowsAffected = ps.executeUpdate();
 
+            // FIX: ensure insert actually happened
+            if (rowsAffected == 0)
+            {
+                throw new RuntimeException("Creating profile failed, no rows affected.");
+            }
+            // FIX: close generated keys result set
+            try (ResultSet generatedKeys = ps.getGeneratedKeys())
+            {
+                // profiles.user_id is usually not auto-generated here (it’s from users),
+                // so we just return the same profile object.
+                // This block is kept to properly close resources and support schemas that generate keys.
+            }
             return profile;
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             throw new RuntimeException(e);
         }
     }
@@ -93,24 +111,33 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
                 "   , state = ? " +
                 "   , zip = ? " +
                 " WHERE user_id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql))
+        {
+            ps.setString(1, profile.getFirstName());
+            ps.setString(2, profile.getLastName());
+            ps.setString(3, profile.getPhone());
+            ps.setString(4, profile.getEmail());
+            ps.setString(5, profile.getAddress());
+            ps.setString(6, profile.getCity());
+            ps.setString(7, profile.getState());
+            ps.setString(8, profile.getZip());
+            ps.setInt(9, userId);
 
-        try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, profile.getFirstName());
-            statement.setString(2, profile.getLastName());
-            statement.setString(3, profile.getPhone());
-            statement.setString(4, profile.getEmail());
-            statement.setString(5, profile.getAddress());
-            statement.setString(6, profile.getCity());
-            statement.setString(7, profile.getState());
-            statement.setString(8, profile.getZip());
-            statement.setInt(9, userId);
+            int rowsAffected = ps.executeUpdate();
 
-            statement.executeUpdate();
-        } catch (SQLException e) {
+            // FIX: ensure a row was actually updated
+            if (rowsAffected == 0)
+            {
+                throw new RuntimeException("Profile not found for update");
+            }
+        }
+        catch (SQLException e)
+        {
             throw new RuntimeException(e);
         }
     }
+
     private Profile mapRow(ResultSet row) throws SQLException
     {
         Profile profile = new Profile();
