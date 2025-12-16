@@ -115,11 +115,7 @@ public class User {
       if(authorities.size() > 0)
       {
          for(Authority role: authorities)
-         {
-            return role.getName().toUpperCase();
-         }
-      }
-
-      return "ROLE_USER";
+         {    return role.getName().toUpperCase(); }
+      }  return "ROLE_USER";
    }
 }

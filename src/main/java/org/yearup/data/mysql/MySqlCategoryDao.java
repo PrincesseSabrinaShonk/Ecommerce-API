@@ -1,7 +1,6 @@
 package org.yearup.data.mysql;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.yearup.data.CategoryDao;
 import org.yearup.models.Category;
@@ -20,15 +19,6 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao{
 @Autowired
     public MySqlCategoryDao(DataSource dataSource){
         super(dataSource);
-    }
-
-    @Override
-    public void addProduct(int userId, int productId) {
-
-    }
-
-    @Override
-    public void updateProduct(int userId, int productId, int quantity) {
 
     }
 
@@ -117,11 +107,15 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao{
             statement.setString(2, category.getDescription());
             statement.setInt(3, categoryId);
             statement.executeUpdate();
-
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected == 0) {
                 throw new RuntimeException("Category not found for update");
             }
+
+
+//            int rowsAffected = statement.executeUpdate();
+//            if (rowsAffected == 0) {
+//                throw new RuntimeException("Category not found for update");
         }
         catch (SQLException e)
         {

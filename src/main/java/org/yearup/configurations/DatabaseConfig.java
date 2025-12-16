@@ -5,10 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.yearup.data.CategoryDao;
-import org.yearup.data.ShoppingCartDao;
-import org.yearup.data.mysql.MySqlCategoryDao;
-import org.yearup.data.mysql.MySqlShoppingCartDao;
+import org.yearup.data.*;
+import org.yearup.data.mysql.*;
 
 @Configuration
 public class DatabaseConfig
@@ -32,7 +30,7 @@ public class DatabaseConfig
         // Used the existing MySqlCategoriesDao implementation (no new DAO created)
         return new MySqlCategoryDao(basicDataSource);
     }
-
+  //Constructor that initializes the BasicDataSource with database credentials
     @Autowired
     public DatabaseConfig(@Value("${datasource.url}") String url,
                           @Value("${datasource.username}") String username,
@@ -43,5 +41,23 @@ public class DatabaseConfig
         basicDataSource.setUsername(username);
         basicDataSource.setPassword(password);
     }
+    @Bean
+    public ProductDao productDao()
+    {
+        return new MySqlProductDao(basicDataSource);
+    }
+
+    @Bean
+    public UserDao userDao()
+    {
+        return new MySqlUserDao(basicDataSource);
+    }
+
+    @Bean
+    public ProfileDao profileDao()
+    {
+        return new MySqlProfileDao(basicDataSource);
+    }
+
 
 }

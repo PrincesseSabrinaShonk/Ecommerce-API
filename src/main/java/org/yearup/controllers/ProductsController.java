@@ -14,9 +14,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/products") // it made sure routes are consistently /products
 @CrossOrigin
-public class ProductsController
+public class ProductsController  //controller for managing products
 {
-    private ProductDao productDao;
+    private ProductDao productDao;  //Constructor injection for ProductDao
 
     @Autowired
     public ProductsController(ProductDao productDao)
@@ -34,14 +34,10 @@ public class ProductsController
     {
         try {
             return productDao.search(categoryId, minPrice, maxPrice, subCategory);
-        }
-             catch(ResponseStatusException ex)
-                {
-                    throw ex;
-                }
-                catch(Exception ex)
-                {
-                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }  catch(ResponseStatusException ex)
+        {  throw ex;
+        }  catch(Exception ex)
+                { throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
                 }
     }
     @GetMapping("/{id}")
@@ -79,7 +75,7 @@ public class ProductsController
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')") // firs bugs was role_Admin
+    @PreAuthorize("hasRole('ADMIN')") // first bugs was role_Admin
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
         try

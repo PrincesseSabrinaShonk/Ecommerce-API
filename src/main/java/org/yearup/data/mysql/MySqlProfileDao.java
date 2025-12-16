@@ -19,22 +19,12 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
     }
 
     @Override
-    public void addProduct(int userId, int productId) {
-
-    }
-
-    @Override
-    public void updateProduct(int userId, int productId, int quantity) {
-
-    }
-
-    @Override
     public Profile create(Profile profile) {
         String sql = "INSERT INTO profiles (user_id, first_name, last_name, phone, email, address, city, state, zip) " +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection connection = getConnection()) {
-            PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, profile.getUserId());
             ps.setString(2, profile.getFirstName());
             ps.setString(3, profile.getLastName());
@@ -44,26 +34,15 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
             ps.setString(7, profile.getCity());
             ps.setString(8, profile.getState());
             ps.setString(9, profile.getZip());
-            int rowsAffected = ps.executeUpdate();
-
-            // FIX: ensure insert actually happened
-            if (rowsAffected == 0)
-            {
-                throw new RuntimeException("Creating profile failed, no rows affected.");
-            }
-            // FIX: close generated keys result set
-            try (ResultSet generatedKeys = ps.getGeneratedKeys())
-            {
-                // profiles.user_id is usually not auto-generated here (it’s from users),
-                // so we just return the same profile object.
-                // This block is kept to properly close resources and support schemas that generate keys.
-            }
+            // profiles.user_id is usually not auto-generated here (it’s from users),
+            // so we just return the same profile object.
+            // This block is kept to properly close resources and support schemas that generate keys.
+            ps.executeUpdate();
             return profile;
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     @Override
@@ -76,9 +55,12 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
                 """;
 
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
+             PreparedStatement ps = connection.prepareStatement(sql))
+        {
+        ps.setInt(1, userId);
+
+         try( ResultSet rs = ps.executeQuery())
+         {
             if (rs.next()) {
                 Profile profile = new Profile();
                 profile.setUserId(rs.getInt("user_id"));
@@ -92,6 +74,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
                 profile.setZip(rs.getString("zip"));
                 return profile;
             }
+            }
             return null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -101,16 +84,19 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
     @Override
     public void update(int userId, Profile profile) // implement later
     {
-        String sql = "UPDATE profiles" +
-                " SET first_name = ? " +
-                "   , last_name = ? " +
-                "   , phone = ? " +
-                "   , email = ? " +
-                "   , address = ? " +
-                "   , city = ? " +
-                "   , state = ? " +
-                "   , zip = ? " +
-                " WHERE user_id = ?";
+        String sql ="""
+        UPDATE profiles
+           SET first_name = ?
+             , last_name  = ?
+             , phone      = ?
+             , email      = ?
+             , address    = ?
+             , city       = ?
+             , state      = ?
+             , zip        = ?
+         WHERE user_id    = ?
+        """;
+
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement(sql))
         {
@@ -131,27 +117,10 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
             {
                 throw new RuntimeException("Profile not found for update");
             }
-        }
-        catch (SQLException e)
+        } catch (SQLException e)
         {
             throw new RuntimeException(e);
         }
-    }
-
-    private Profile mapRow(ResultSet row) throws SQLException
-    {
-        Profile profile = new Profile();
-        profile.setUserId(row.getInt("user_id"));
-        profile.setFirstName(row.getString("first_name"));
-        profile.setLastName(row.getString("last_name"));
-        profile.setPhone(row.getString("phone"));
-        profile.setEmail(row.getString("email"));
-        profile.setAddress(row.getString("address"));
-        profile.setCity(row.getString("city"));
-        profile.setState(row.getString("state"));
-        profile.setZip(row.getString("zip"));
-
-        return profile;
     }
 }
 

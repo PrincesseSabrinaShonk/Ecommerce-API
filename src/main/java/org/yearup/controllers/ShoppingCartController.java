@@ -21,6 +21,8 @@ import java.security.Principal;
 @RequestMapping("/cart")
 @CrossOrigin // allow cross-site requests (matches other controllers)
 @PreAuthorize("isAuthenticated()")
+
+
 public class ShoppingCartController {
     // a shopping cart requires
     private final ShoppingCartDao shoppingCartDao;
@@ -126,4 +128,14 @@ public class ShoppingCartController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }
+    @DeleteMapping("/products/{productId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT) // 204
+    public void removeProductFromCart(@PathVariable int productId, Principal principal)
+    {
+        int userId = userDao.getByUserName(principal.getName()).getId();
+        shoppingCartDao.removeProduct(userId, productId);
+    }
+
 }
+
+

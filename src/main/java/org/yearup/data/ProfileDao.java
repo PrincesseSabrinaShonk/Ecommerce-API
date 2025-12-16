@@ -10,4 +10,4 @@ public interface ProfileDao
     void update(int userId, Profile profile);    // Updates an existing user's profile in the database
 
 }
-// need to fix
+

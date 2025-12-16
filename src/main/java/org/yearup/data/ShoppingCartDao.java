@@ -9,6 +9,7 @@ public interface ShoppingCartDao {
     void addProduct(int userId, int productId);
     void updateProduct(int userId, int productId, int quantity);
     void clearCart(int userId);
-
+    // add: required for DELETE /cart/products/{productId}
+    void removeProduct(int userId, int productId);
 }
 

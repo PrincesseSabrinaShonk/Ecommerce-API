@@ -8,8 +8,9 @@ public class ShoppingCartItem
 {
     private Product product = null;
     private int quantity = 1;
-    private BigDecimal discountPercent;
-//    private BigDecimal discountPercent = BigDecimal.ZERO;   i replace this with line 11
+    private BigDecimal discountPercent = BigDecimal.ZERO;
+    private BigDecimal lineTotal = null; //store lineTotal when set Fix
+
 
     public ShoppingCartItem()
     {
@@ -51,23 +52,19 @@ public class ShoppingCartItem
         return this.product.getProductId();
     }
 
-    public BigDecimal getLineTotal()
-    {
-        BigDecimal price = product.getPrice();
-        BigDecimal qty = new BigDecimal(quantity);
-        BigDecimal total = price.multiply(qty);
-        if(discountPercent != null && discountPercent.compareTo(BigDecimal.ZERO) > 0)
-        {
-            BigDecimal discount = total.multiply(discountPercent);
-            total = total.subtract(discount);
-        }
-        return total;
+    public BigDecimal getLineTotal(){
+        // FIX: if lineTotal was explicitly set (from DAO), return it
+        if (lineTotal != null)
+            return lineTotal;
+        BigDecimal basePrice = product.getPrice();  // otherwise compute it
+        BigDecimal qty = new BigDecimal(this.quantity);
+        BigDecimal subTotal = basePrice.multiply(qty);
+        BigDecimal discountAmount = subTotal.multiply(discountPercent);
+        return subTotal.subtract(discountAmount);
+
+
+    }  public void setLineTotal(BigDecimal lineTotal)
+    {this.lineTotal = lineTotal;
     }
 }
-//        BigDecimal basePrice = product.getPrice();
-//        BigDecimal quantity = new BigDecimal(this.quantity);
-//
-//        BigDecimal subTotal = basePrice.multiply(quantity);
-//        BigDecimal discountAmount = subTotal.multiply(discountPercent);
-//
-//        return subTotal.subtract(discountAmount);
+
