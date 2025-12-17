@@ -102,7 +102,7 @@ public class CategoriesController
     // ADMIN ONLY
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // i change role admin
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable int id)
     {
