@@ -11,16 +11,14 @@
 <h2> Project Overview</h2>
 
 <p>
-EasyShop is a RESTful e-commerce backend application
-The purpose of this project was to create a fully functional and secure API that mirrors real-world online shopping systems.
-It supports core features such as browsing products, managing categories, handling shopping carts, and processing orders.
+Easy Shop is a full-stack e-commerce API that allows users to browse products, manage shopping carts, and place orders,
+  while giving administrators secure tools to manage products and categories. The application is built with Spring Boot and follows RESTful design principles,
+  including proper HTTP methods, status codes, and role-based access control. Security is enforced using authentication and authorization to ensure only admins can perform sensitive actions like creating,
+  updating, or deleting products. Throughout the project, I focused on fixing bugs, improving endpoint behavior,
+  and validating functionality through testing to ensure the application works reliably and securely.
 </p>
 
 <p>
-Through this project, 
-I was able to apply and strengthen my backend development skills using Java, Spring Boot, Spring Security, and MySQL. 
-It also reflects my understanding of RESTful design principles, scalable architecture, 
-and role-based authorization to ensure secure access to application resources.
 </p>
 
 <hr/>
@@ -189,6 +187,8 @@ Most importantly, this project taught me how to debug and reason through backend
 ">
 🚀 <strong>Outcome:</strong> This capstone challenged me to think like a backend engineer working on a real production system, not just a school assignment.
 </div>
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/5168dc8a-3bac-4f04-8249-ac4285eb57f1" />
+
 
 <hr />
 
