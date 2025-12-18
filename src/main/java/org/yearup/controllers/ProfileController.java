@@ -61,12 +61,13 @@ public class ProfileController
         try
         {
             String userName = principal.getName();            // Get currently logged-in username
-
             // Verify the user exists
             User user = userDao.getByUserName(userName);
+            // If there is no user, then stop what you’re doing and return an HTTP 401 Unauthorized response.
             if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
             int userId = user.getId();
+            // FIX: update should call update, not create
             profileDao.update(userId, profile);  // Update user's profile using their userID
 
             return profileDao.getByUserId(userId); // Return updated profile

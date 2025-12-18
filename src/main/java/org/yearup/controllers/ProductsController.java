@@ -85,12 +85,16 @@ public class ProductsController  //controller for managing products
     // PUT /products/{id}
     // Updates an existing product
     // Admin-only endpoint
+
+    //This method lets an admin user update an existing product in the system.
+    //It takes the product’s ID from the URL,
+    // takes the new product data from the request body, and saves the changes to the database.
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')") // first bugs was role_Admin
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
-    {
+    { //Calls the DAO to update the existing product in the database.
         try  // Update the product with the given ID
-        { productDao.update(id, product);  }
+        { productDao.update(id, product);  } // FIX: update should call update, not create
             // productDao.create(product); ( we need to change this) i change line 83
         catch(ResponseStatusException ex)
         {
