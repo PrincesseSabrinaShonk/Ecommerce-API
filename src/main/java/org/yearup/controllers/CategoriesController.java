@@ -22,8 +22,9 @@ import java.util.List;
 @RequestMapping("/categories")
     @CrossOrigin
 public class CategoriesController
-{
+{ // DAO responsible for category-related database operations
     private CategoryDao categoryDao;
+    // DAO responsible for product-related database operations
     private ProductDao productDao;
 
 
@@ -36,26 +37,23 @@ public class CategoriesController
     }
 
     // add the appropriate annotation for a get action
+     //GET /categories
+     // Returns a list of all categories.
+
     @GetMapping
     public List<Category> getAll()
     {
-        // find and return all categories
+        // find and return all categories from the database
         return categoryDao.getAllCategories();
     }
 
-    // add the appropriate annotation for a get action
-//    @GetMapping("/{id}")
-//    public Category getById(@PathVariable int id)
-//    { return categoryDao.getById(id); }
-        // get the category by id
-
+    // GET /categories/{id}, Returns a single category by ID.
     @GetMapping("/{id}")
     public Category getById(@PathVariable int id)
     {
         Category category = categoryDao.getById(id);
-
         if (category == null)
-        {
+        {   // If no category is found, return 404 Not Found
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return category;
@@ -68,7 +66,7 @@ public class CategoriesController
     @GetMapping("/{categoryId}/products")
     public List<Product> getProductsById(@PathVariable int categoryId)
     {
-        // get a list of product by categoryId
+        // Retrieve all products for the given category ID
         return productDao.listByCategoryId(categoryId);
     }
 
@@ -102,13 +100,13 @@ public class CategoriesController
     // ADMIN ONLY
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')") // i change role admin
+    @PreAuthorize("hasRole('ADMIN')") // i change role admin
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable int id)
     {
-        Category category = categoryDao.getById(id);
-        if (category == null)
+        Category category = categoryDao.getById(id);    // Check if the category exists
+        if (category == null)  // If not found, return 404
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        categoryDao.delete(id);
+        categoryDao.delete(id); // Delete the category
     }
 }

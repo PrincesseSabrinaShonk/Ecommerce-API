@@ -8,17 +8,29 @@ import org.springframework.context.annotation.Configuration;
 import org.yearup.data.*;
 import org.yearup.data.mysql.*;
 
+
+/**
+ * DatabaseConfig is responsible for configuring the database connection
+ * and registering all DAO beans used throughout the application.
+ *
+ * This class centralizes database setup so all DAOs share
+ * the same connection pool.
+ */
 @Configuration
 public class DatabaseConfig
 {
+    // Connection pool used by all DAO implementations
+
     private BasicDataSource basicDataSource;
 
+
+    //Exposes the BasicDataSource as a Spring Bean.
+    // Spring will inject this DataSource wherever it is needed
     @Bean
     public BasicDataSource dataSource()
     {
         return basicDataSource;
     }
-
     @Bean
     public ShoppingCartDao shoppingCartDao() //register ShoppingCartDao as a Spring bean so ShoppingCartController can be created
     {
@@ -41,7 +53,7 @@ public class DatabaseConfig
         basicDataSource.setUsername(username);
         basicDataSource.setPassword(password);
     }
-    @Bean
+    @Bean  // Registers the ProductDao bean for product-related database operations.
     public ProductDao productDao()
     {
         return new MySqlProductDao(basicDataSource);
@@ -53,11 +65,12 @@ public class DatabaseConfig
         return new MySqlUserDao(basicDataSource);
     }
 
-    @Bean
+    @Bean // Registers the ProfileDao bean used to manage user profile data.
     public ProfileDao profileDao()
     {
         return new MySqlProfileDao(basicDataSource);
     }
 
-
+// A Spring Bean is an object managed by the Spring container,
+// allowing dependencies to be injected automatically rather than created manually.
 }

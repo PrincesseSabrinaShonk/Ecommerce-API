@@ -18,15 +18,17 @@ import java.security.Principal;
 // convert this class to a REST controller
 // only logged-in users should have access to these actions
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/cart")  // Base URL for all shopping cart endpoints
 @CrossOrigin // allow cross-site requests (matches other controllers)
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("isAuthenticated()") // Ensures ONLY authenticated (logged-in) users can access cart functionality
 
 
 public class ShoppingCartController {
-    // a shopping cart requires
+    // DAO used to manage shopping cart data
     private final ShoppingCartDao shoppingCartDao;
+    // DAO used to look up the currently authenticated user
     private final UserDao userDao;
+    // DAO used to validate products before adding them to the cart
     private final ProductDao productDao;
 
     @Autowired
@@ -36,7 +38,8 @@ public class ShoppingCartController {
         this.productDao = productDao;
     }
 
-    // each method in this controller requires a Principal object as a parameter
+    // GET /cart
+    // Retrieves the shopping cart for the currently authenticated user
     @GetMapping("")
     public ShoppingCart getCart(Principal principal) {
         try {
@@ -47,7 +50,7 @@ public class ShoppingCartController {
             if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
             int userId = user.getId();
 
-            // use the shopping-cart-Dao to get all items in the cart and return the cart
+            // Retrieve and return the user's shopping cart
             return shoppingCartDao.getByUserId(userId);
         } catch (ResponseStatusException ex) {
             throw ex;
@@ -59,14 +62,15 @@ public class ShoppingCartController {
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
     @PostMapping("/products/{productId}")
-    public ShoppingCart addProductToCart(@PathVariable int productId, Principal principal) {
+    public ShoppingCart addProductToCart(@PathVariable int productId, Principal principal) { //Add product to the authenticated user's cart
         try {
+            // Identify the logged-in user
             String userName = principal.getName();
             User user = userDao.getByUserName(userName);
             if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
             int userId = user.getId();
-
+            // Validate that the product exists
             if (productDao.getById(productId) == null)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
@@ -84,20 +88,25 @@ public class ShoppingCartController {
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
 
+
+    // Updates the quantity of a product already in the user's cart
     @PutMapping("/products/{productId}")
     public ShoppingCart updateProductInCart(@PathVariable int productId, @RequestBody ShoppingCartItem item, Principal principal) {
         try {
+            // Identify the authenticated user
             String userName = principal.getName();
             User user = userDao.getByUserName(userName);
+            // Validate product existence
             if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
             int userId = user.getId();
 
             if (productDao.getById(productId) == null) // validate product exists
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
+            // Validate request body and quantity
             if(item == null || item.getQuantity() < 0)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantity must be 0 or greater.");
-
+            // Update product quantity in cart
             shoppingCartDao.updateProduct(userId,productId, item.getQuantity());  //update quantity
             return shoppingCartDao.getByUserId(userId);
         }
@@ -112,6 +121,7 @@ public class ShoppingCartController {
     // https://localhost:8080/cart
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    // Clears all items from the authenticated user's cart
     public void clearCart(Principal principal)  {
         try
         {
@@ -120,7 +130,7 @@ public class ShoppingCartController {
             if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
             int userId = user.getId();
-            shoppingCartDao.clearCart(userId);  //clear all product from cart
+            shoppingCartDao.clearCart(userId);   // Remove all products from the user's cart
         }  catch(ResponseStatusException ex) {
             throw ex;} // preserve correct HTTP status codes
         catch(Exception ex)
@@ -128,11 +138,14 @@ public class ShoppingCartController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }
+    // Removes a single product from the authenticated user's cart
     @DeleteMapping("/products/{productId}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204
     public void removeProductFromCart(@PathVariable int productId, Principal principal)
     {
+        // Get the authenticated user's ID
         int userId = userDao.getByUserName(principal.getName()).getId();
+        // Remove the specified product from the cart
         shoppingCartDao.removeProduct(userId, productId);
     }
 

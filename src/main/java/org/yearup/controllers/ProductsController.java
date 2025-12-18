@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products") // it made sure routes are consistently /products
-@CrossOrigin
+@RequestMapping("/products") // Base URL for all product-related endpoints
+@CrossOrigin  // Allows requests from different origins
 public class ProductsController  //controller for managing products
 {
     private ProductDao productDao;  //Constructor injection for ProductDao
@@ -24,6 +24,9 @@ public class ProductsController  //controller for managing products
         this.productDao = productDao;
     }
 
+
+    // GET products
+    // Supports optional query parameters for filtering products
     @GetMapping("")
     @PreAuthorize("permitAll()")
     public List<Product> search(@RequestParam(name="cat", required = false) Integer categoryId,
@@ -32,7 +35,7 @@ public class ProductsController  //controller for managing products
                                 @RequestParam(name="subCategory", required = false) String subCategory
                                 )
     {
-        try {
+        try { // Delegate filtering logic to the DAO
             return productDao.search(categoryId, minPrice, maxPrice, subCategory);
         }  catch(ResponseStatusException ex)
         {  throw ex;
@@ -40,14 +43,16 @@ public class ProductsController  //controller for managing products
                 { throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
                 }
     }
+    // GET /products/{id}
+    // Retrieves a single product by its ID
     @GetMapping("/{id}")
     @PreAuthorize("permitAll()")
     public Product getById(@PathVariable int id )
     {
         try {
             var product = productDao.getById(id);
-            if (product == null)
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            if (product == null)   // If no product exists with this ID, return 404
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND); // Re-throw known HTTP errors 401
             return product;
         }
         catch(ResponseStatusException ex)
@@ -56,12 +61,15 @@ public class ProductsController  //controller for managing products
             {throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");}
         }
 
+    // POST /products
+    // Creates a new product
+    // Admin-only endpoint
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public Product addProduct(@RequestBody Product product)
     {
         try
-        {
+        { // Persist the new product to the database
             return productDao.create(product);
         }
         catch(ResponseStatusException ex)
@@ -74,11 +82,14 @@ public class ProductsController  //controller for managing products
         }
     }
 
+    // PUT /products/{id}
+    // Updates an existing product
+    // Admin-only endpoint
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')") // first bugs was role_Admin
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
-        try
+        try  // Update the product with the given ID
         { productDao.update(id, product);  }
             // productDao.create(product); ( we need to change this) i change line 83
         catch(ResponseStatusException ex)
@@ -87,24 +98,23 @@ public class ProductsController  //controller for managing products
         catch(Exception ex)
         {throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");}
     }
-
+    // DELETE /products/{id}
+    // Deletes a product by ID
+    // Admin-only endpoint
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(@PathVariable int id)
     {
-        try {
+        try { // Check if the product exists before deleting
             var product = productDao.getById(id);
             if (product == null)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-            productDao.delete(id);
+            productDao.delete(id);   // Remove product from database
         }
         catch(ResponseStatusException ex)
-            {
-                throw ex;
-            }
-                catch(Exception ex)
-            {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            {  throw ex;
+            } catch(Exception ex)
+            {throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
             }
         }
     }
